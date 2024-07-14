@@ -1,5 +1,5 @@
-import { EmptyPlaceholder } from "@/components/empty-placeholder"
-import { DashboardHeader } from "@/components/header"
+import { EmptyPlaceholder } from "@/components/empty-placeholders/empty-placeholder"
+import { DashboardHeader } from "@/components/navigation/header"
 import { PostCreateButton } from "@/components/post-create-button"
 import { PostItem } from "@/components/post-item"
 import { DashboardShell } from "@/components/shell"

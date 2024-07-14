@@ -6,9 +6,9 @@ import "@/styles/globals.css"
 import { siteConfig } from "@/config/site"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
-import { Analytics } from "@/components/analytics"
+import { Analytics } from "@/components/analytics/analytics"
 import { TailwindIndicator } from "@/components/tailwind-indicator"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/app/_providers/theme-provider"
 
 const fontSans = FontSans({
   subsets: ["latin"],

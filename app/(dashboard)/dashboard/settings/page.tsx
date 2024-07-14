@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 
-import { getUser } from "@/app/supabase-server"
-import { DashboardHeader } from "@/components/header"
+import { UserNameForm } from "@/components/forms/user-name-form"
+import { DashboardHeader } from "@/components/navigation/header"
 import { DashboardShell } from "@/components/shell"
-import { UserNameForm } from "@/components/user-name-form"
+import { getUser } from "@/app/supabase-server"
 
 export const metadata = {
   title: "Settings",
@@ -14,7 +14,7 @@ export default async function SettingsPage() {
   const user = await getUser()
 
   if (!user) {
-    redirect( "/login")
+    redirect("/login")
   }
 
   return (

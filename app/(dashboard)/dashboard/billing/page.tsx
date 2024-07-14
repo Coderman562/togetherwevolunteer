@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 
 import { stripe } from "@/lib/stripe"
 import { getUserSubscriptionPlan } from "@/lib/subscription"
-import { getUser } from "@/app/supabase-server"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   Card,
@@ -11,10 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { BillingForm } from "@/components/billing-form"
-import { DashboardHeader } from "@/components/header"
+import { BillingForm } from "@/components/forms/billing-form"
 import { Icons } from "@/components/icons"
+import { DashboardHeader } from "@/components/navigation/header"
 import { DashboardShell } from "@/components/shell"
+import { getUser } from "@/app/supabase-server"
 
 export const metadata = {
   title: "Billing",

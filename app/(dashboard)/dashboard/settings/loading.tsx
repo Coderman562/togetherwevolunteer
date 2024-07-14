@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
-import { CardSkeleton } from "@/components/card-skeleton"
-import { DashboardHeader } from "@/components/header"
+import { DashboardHeader } from "@/components/navigation/header"
 import { DashboardShell } from "@/components/shell"
+import { CardSkeleton } from "@/components/skeleton-loaders/card-skeleton"
 
 export default function DashboardSettingsLoading() {
   return (
