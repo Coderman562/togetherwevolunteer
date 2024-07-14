@@ -1,0 +1,400 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String
+  email                  String    @unique
+  emailVerified          DateTime? @db.Timestamptz(3)
+  image                  String?
+  createdAt              DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime  @updatedAt @db.Timestamptz(3)
+  phoneNumber            String?
+  age                    Int?
+  address                String?
+  city                   String?
+  state                  String?
+  country                String?
+  postalCode             String?
+  emergencyContactName   String?
+  emergencyContactPhone  String?
+  skills                 String?
+  availability           Json?
+  certifications         String?
+  totalHours             Int?
+  profilePicture         String?
+  usesAuthentication     Boolean
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime? @db.Timestamptz(3)
+
+  VolunteersJoinings   VolunteersJoining[]
+  UserOrganizations    UserOrganization[]
+  EventRegistrations   EventRegistration[]
+  Donations            Donation[]
+  CommunicationLogs    CommunicationLog[]
+  FeedbackAndSurveys   FeedbackAndSurvey[]
+  HoursLogged          HoursLogged[]
+  Documents            Document[]
+  ActivityRegistration ActivityRegistration[]
+
+  @@map("users")
+}
+
+model Organization {
+  id                          Int       @id @default(autoincrement())
+  name                        String
+  description                 String?
+  websiteUrl                  String?
+  logoUrl                     String?
+  contactEmail                String?
+  contactPhone                String?
+  address                     String?
+  city                        String?
+  state                       String?
+  country                     String?
+  postalCode                  String?
+  openingHours                Json?
+  requiresVolunteerApproval   Boolean?
+  registrationNumber          String?
+  taxId                       String?
+  verificationStatus          String?
+  verificationDocuments       Json?
+  customHourLoggingFields     Json?
+  volunteerRegistrationFields Json?
+  termsAndAgreements          Json?
+  colorTheme                  Json?
+  siteInformation             Json?
+  socialFacebook              String?
+  socialTwitter               String?
+  socialInstagram             String?
+  socialLinkedin              String?
+  socialYoutube               String?
+  socialTiktok                String?
+  socialYelp                  String?
+  stripeCustomerId            String?
+  stripeSubscriptionId        String?
+  stripePriceId               String?
+  stripeCurrentPeriodEnd      DateTime? @db.Timestamptz(3)
+  createdAt                   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt                   DateTime  @updatedAt @db.Timestamptz(3)
+
+  VolunteersJoinings VolunteersJoining[]
+  UserOrganizations  UserOrganization[]
+  Events             Event[]
+  Campaigns          Campaign[]
+  Donations          Donation[]
+  Programs           Program[]
+  Communications     Communication[]
+  CommunicationLogs  CommunicationLog[]
+  HoursLogged        HoursLogged[]
+  Documents          Document[]
+  Activity           Activity[]
+
+  @@map("organizations")
+}
+
+model VolunteersJoining {
+  id               Int       @id @default(autoincrement())
+  userId           String    @db.Uuid
+  organizationId   Int
+  status           String
+  requestedAt      DateTime  @default(now()) @db.Timestamptz(3)
+  reviewedAt       DateTime? @db.Timestamptz(3)
+  reviewedBy       String?
+  registrationData Json
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("volunteersJoining")
+}
+
+model UserOrganization {
+  id             Int      @id @default(autoincrement())
+  userId         String   @db.Uuid
+  organizationId Int
+  role           String
+  permissions    Json
+  filledFields   Json
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("userOrganizations")
+}
+
+model Event {
+  id                        Int       @id @default(autoincrement())
+  organizationId            Int
+  programId                 Int?
+  name                      String
+  description               String?
+  location                  String?
+  startTime                 DateTime  @db.Timestamptz(3)
+  endTime                   DateTime  @db.Timestamptz(3)
+  recurrencePattern         String?
+  recurrenceEndDate         DateTime? @db.Timestamptz(3)
+  registrationEmailTemplate String?
+  wysiwygContent            Json?
+  createdAt                 DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt                 DateTime  @updatedAt @db.Timestamptz(3)
+
+  organization       Organization        @relation(fields: [organizationId], references: [id])
+  program            Program?            @relation(fields: [programId], references: [id])
+  EventActivities    EventActivity[]
+  EventRegistrations EventRegistration[]
+  HoursLogged        HoursLogged[]
+  FeedbackAndSurvey  FeedbackAndSurvey[]
+  Document           Document[]
+
+  @@map("events")
+}
+
+model EventActivity {
+  id                         Int      @id @default(autoincrement())
+  eventId                    Int
+  name                       String
+  description                String?
+  minAgeRequirement          Int?
+  otherRequirements          Json?
+  requiredRegistrationFields Json?
+  documents                  Json?
+  wysiwygContent             Json?
+  createdAt                  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime @updatedAt @db.Timestamptz(3)
+
+  event              Event               @relation(fields: [eventId], references: [id])
+  ActivityTimeSlots  ActivityTimeSlot[]
+  EventRegistrations EventRegistration[]
+  HoursLogged        HoursLogged[]
+
+  @@map("eventActivities")
+}
+
+model ActivityTimeSlot {
+  id         Int      @id @default(autoincrement())
+  activityId Int
+  startTime  DateTime @db.Timestamptz(3)
+  endTime    DateTime @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  eventActivity      EventActivity       @relation(fields: [activityId], references: [id])
+  EventRegistrations EventRegistration[]
+
+  @@map("activityTimeSlots")
+}
+
+model EventRegistration {
+  id           Int      @id @default(autoincrement())
+  eventId      Int
+  userId       String   @db.Uuid
+  activityId   Int?
+  timeSlotId   Int?
+  guestCount   Int?
+  status       String
+  registeredAt DateTime @default(now()) @db.Timestamptz(3)
+
+  event            Event             @relation(fields: [eventId], references: [id])
+  user             User              @relation(fields: [userId], references: [id])
+  eventActivity    EventActivity?    @relation(fields: [activityId], references: [id])
+  activityTimeSlot ActivityTimeSlot? @relation(fields: [timeSlotId], references: [id])
+
+  @@map("eventRegistrations")
+}
+
+model Campaign {
+  id             Int      @id @default(autoincrement())
+  organizationId Int
+  name           String
+  description    String?
+  goalAmount     Decimal
+  startDate      DateTime @db.Timestamptz(3)
+  endDate        DateTime @db.Timestamptz(3)
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  Donations    Donation[]
+
+  @@map("campaigns")
+}
+
+model Donation {
+  id             Int      @id @default(autoincrement())
+  userId         String   @db.Uuid
+  organizationId Int
+  amount         Decimal
+  currency       String
+  donationDate   DateTime @db.Timestamptz(3)
+  paymentMethod  String
+  campaignId     Int?
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  campaign     Campaign?    @relation(fields: [campaignId], references: [id])
+
+  @@map("donations")
+}
+
+model CommunicationLog {
+  id             Int      @id @default(autoincrement())
+  userId         String   @db.Uuid
+  organizationId Int
+  type           String
+  content        String
+  sentAt         DateTime @db.Timestamptz(3)
+  status         String
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("communicationLogs")
+}
+
+model FeedbackAndSurvey {
+  id           Int      @id @default(autoincrement())
+  userId       String   @db.Uuid
+  eventId      Int?
+  feedbackText String
+  rating       Int
+  submittedAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  user  User   @relation(fields: [userId], references: [id])
+  event Event? @relation(fields: [eventId], references: [id])
+
+  @@map("feedbackAndSurveys")
+}
+
+model Program {
+  id                      Int      @id @default(autoincrement())
+  organizationId          Int
+  name                    String
+  description             String?
+  startDate               DateTime @db.Timestamptz(3)
+  endDate                 DateTime @db.Timestamptz(3)
+  createdAt               DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime @updatedAt @db.Timestamptz(3)
+  colors                  Json
+  customHourLoggingFields Json?
+  customFieldsEnabled     Boolean
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  Events       Event[]
+  Activities   Activity[]
+  HoursLogged  HoursLogged[]
+  Document     Document[]
+
+  @@map("programs")
+}
+
+model Activity {
+  id                      Int      @id @default(autoincrement())
+  programId               Int
+  organizationId          Int
+  name                    String
+  description             String?
+  startTime               DateTime @db.Timestamptz(3)
+  endTime                 DateTime @db.Timestamptz(3)
+  location                String?
+  createdAt               DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime @updatedAt @db.Timestamptz(3)
+  customHourLoggingFields Json?
+  customFieldsEnabled     Boolean
+
+  program               Program                @relation(fields: [programId], references: [id])
+  organization          Organization           @relation(fields: [organizationId], references: [id])
+  ActivityRegistrations ActivityRegistration[]
+  HoursLogged           HoursLogged[]
+
+  @@map("activities")
+}
+
+model ActivityRegistration {
+  id           Int      @id @default(autoincrement())
+  activityId   Int
+  userId       String   @db.Uuid
+  status       String
+  registeredAt DateTime @default(now()) @db.Timestamptz(3)
+
+  activity Activity @relation(fields: [activityId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@map("activityRegistrations")
+}
+
+model HoursLogged {
+  id             Int       @id @default(autoincrement())
+  userId         String    @db.Uuid
+  eventId        Int?
+  organizationId Int
+  programId      Int?
+  activityId     Int?
+  hours          Decimal
+  notes          String?
+  date           DateTime  @db.Timestamptz(3)
+  status         String
+  verifiedBy     String?
+  approvedAt     DateTime? @db.Timestamptz(3)
+  loggedAt       DateTime  @default(now()) @db.Timestamptz(3)
+  customFields   Json?
+
+  user            User           @relation(fields: [userId], references: [id])
+  event           Event?         @relation(fields: [eventId], references: [id])
+  organization    Organization   @relation(fields: [organizationId], references: [id])
+  program         Program?       @relation(fields: [programId], references: [id])
+  activity        Activity?      @relation(fields: [activityId], references: [id])
+  EventActivity   EventActivity? @relation(fields: [eventActivityId], references: [id])
+  eventActivityId Int?
+
+  @@map("hoursLogged")
+}
+
+model Document {
+  id             Int      @id @default(autoincrement())
+  userId         String   @db.Uuid
+  eventId        Int?
+  programId      Int?
+  organizationId Int
+  name           String
+  description    String?
+  filePath       String
+  uploadedAt     DateTime @default(now()) @db.Timestamptz(3)
+  documentType   String
+
+  user         User         @relation(fields: [userId], references: [id])
+  event        Event?       @relation(fields: [eventId], references: [id])
+  program      Program?     @relation(fields: [programId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("documents")
+}
+
+model Communication {
+  id                Int      @id @default(autoincrement())
+  organizationId    Int
+  name              String
+  description       String?
+  emailSubject      String
+  emailBody         String
+  scheduleType      String
+  scheduleTime      DateTime @db.Timestamptz(3)
+  recurrencePattern String?
+  nextSendTime      DateTime @db.Timestamptz(3)
+  createdAt         DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("communications")
+}
