@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { allDocs } from "contentlayer/generated"
 
 import { getTableOfContents } from "@/lib/toc"
-import { Mdx } from "@/components/mdx-components"
+import { Mdx } from "@/components/mdx/mdx-components"
 import { DocsPageHeader } from "@/components/page-header"
 import { DocsPager } from "@/components/pager"
 import { DashboardTableOfContents } from "@/components/toc"

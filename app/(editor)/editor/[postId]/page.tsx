@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 
-import { Editor } from "@/components/editor"
+import { Editor } from "@/components/mdx/editor"
 import { getPostForUser, getUser } from "@/actions/supabase-server"
 
 interface EditorPageProps {
