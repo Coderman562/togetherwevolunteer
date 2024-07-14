@@ -4,7 +4,7 @@ import { dashboardConfig } from "@/config/dashboard"
 import { MainNav } from "@/components/navigation/main-nav"
 import { DashboardNav } from "@/components/navigation/nav"
 import { SiteFooter } from "@/components/site-footer"
-import { getAuthUser } from "@/app/supabase-server"
+import { getAuthUser } from "@/actions/supabase-server"
 import { UserAccountNav } from "@/components/navigation/user-account-nav"
 
 interface DashboardLayoutProps {

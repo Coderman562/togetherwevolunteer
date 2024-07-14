@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { getUser } from "@/app/supabase-server"
+import { getUser } from "@/actions/supabase-server"
 
 interface AuthLayoutProps {
   children: React.ReactNode

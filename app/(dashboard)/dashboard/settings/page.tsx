@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { UserNameForm } from "@/components/forms/user-name-form"
 import { DashboardHeader } from "@/components/navigation/header"
 import { DashboardShell } from "@/components/shell"
-import { getUser } from "@/app/supabase-server"
+import { getUser } from "@/actions/supabase-server"
 
 export const metadata = {
   title: "Settings",

@@ -3,7 +3,7 @@ import { DashboardHeader } from "@/components/navigation/header"
 import { PostCreateButton } from "@/components/post-create-button"
 import { PostItem } from "@/components/post-item"
 import { DashboardShell } from "@/components/shell"
-import { createServerSupabaseClient } from "@/app/supabase-server"
+import { createServerSupabaseClient } from "@/actions/supabase-server"
 
 export const metadata = {
   title: "Dashboard",

@@ -14,7 +14,7 @@ import { BillingForm } from "@/components/forms/billing-form"
 import { Icons } from "@/components/icons"
 import { DashboardHeader } from "@/components/navigation/header"
 import { DashboardShell } from "@/components/shell"
-import { getUser } from "@/app/supabase-server"
+import { getUser } from "@/actions/supabase-server"
 
 export const metadata = {
   title: "Billing",

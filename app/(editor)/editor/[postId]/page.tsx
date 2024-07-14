@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 
 import { Editor } from "@/components/editor"
-import { getPostForUser, getUser } from "@/app/supabase-server"
+import { getPostForUser, getUser } from "@/actions/supabase-server"
 
 interface EditorPageProps {
   params: { postId: string }

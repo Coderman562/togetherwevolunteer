@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { MainNav } from "@/components/navigation/main-nav"
 import { SiteFooter } from "@/components/site-footer"
 
-import { getUser } from "../supabase-server"
+import { getUser } from "@/actions/supabase-server"
 
 interface MarketingLayoutProps {
   children: React.ReactNode

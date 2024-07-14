@@ -2,7 +2,7 @@
 // TODO: Fix this when we turn strict mode on.
 import { UserSubscriptionPlan } from "types"
 import { freePlan, proPlan } from "@/config/subscriptions"
-import { createServerSupabaseClient } from "@/app/supabase-server"
+import { createServerSupabaseClient } from "@/actions/supabase-server"
 
 export async function getUserSubscriptionPlan(
   userId: string

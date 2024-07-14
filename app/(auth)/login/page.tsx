@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 import UserAuthForm from "@/components/forms/user-auth-form"
-import { getAuthUser } from "@/app/supabase-server"
+import { getAuthUser } from "@/actions/supabase-server"
 
 export const metadata: Metadata = {
   title: "Login",
