@@ -201,7 +201,8 @@ model EventRegistration {
   userId       String   @db.Uuid
   activityId   Int?
   timeSlotId   Int?
-  guestCount   Int?
+  guestCount   Int? // Field for the number of guests
+  guests       Json? // Field for guest information
   status       String
   registeredAt DateTime @default(now()) @db.Timestamptz(3)
 
