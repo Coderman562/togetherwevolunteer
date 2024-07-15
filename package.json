@@ -14,6 +14,7 @@
     "lint": "next lint",
     "preview": "next build && next start",
     "generate-types": "npx supabase gen types typescript --project-id iamrkftjgskyosholbwj --schema public > types/db.ts",
+    "migrate": "npx prisma migrate dev --name",
     "postinstall": "npm run generate-types"
   },
   "dependencies": {
