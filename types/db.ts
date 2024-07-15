@@ -496,6 +496,7 @@ export type Database = {
           activityId: number | null
           eventId: number
           guestCount: number | null
+          guests: Json | null
           id: number
           registeredAt: string
           status: string
@@ -506,6 +507,7 @@ export type Database = {
           activityId?: number | null
           eventId: number
           guestCount?: number | null
+          guests?: Json | null
           id?: number
           registeredAt?: string
           status: string
@@ -516,6 +518,7 @@ export type Database = {
           activityId?: number | null
           eventId?: number
           guestCount?: number | null
+          guests?: Json | null
           id?: number
           registeredAt?: string
           status?: string
@@ -981,9 +984,9 @@ export type Database = {
           certifications: string | null
           city: string | null
           country: string | null
-          createdAt: string
+          created_at: string
           email: string
-          emailVerified: string | null
+          email_verified: string | null
           emergencyContactName: string | null
           emergencyContactPhone: string | null
           id: string
@@ -999,8 +1002,8 @@ export type Database = {
           stripePriceId: string | null
           stripeSubscriptionId: string | null
           totalHours: number | null
-          updatedAt: string
-          usesAuthentication: boolean
+          updated_at: string | null
+          usesAuthentication: boolean | null
         }
         Insert: {
           address?: string | null
@@ -1009,9 +1012,9 @@ export type Database = {
           certifications?: string | null
           city?: string | null
           country?: string | null
-          createdAt?: string
+          created_at?: string
           email: string
-          emailVerified?: string | null
+          email_verified?: string | null
           emergencyContactName?: string | null
           emergencyContactPhone?: string | null
           id?: string
@@ -1027,8 +1030,8 @@ export type Database = {
           stripePriceId?: string | null
           stripeSubscriptionId?: string | null
           totalHours?: number | null
-          updatedAt: string
-          usesAuthentication: boolean
+          updated_at?: string | null
+          usesAuthentication?: boolean | null
         }
         Update: {
           address?: string | null
@@ -1037,9 +1040,9 @@ export type Database = {
           certifications?: string | null
           city?: string | null
           country?: string | null
-          createdAt?: string
+          created_at?: string
           email?: string
-          emailVerified?: string | null
+          email_verified?: string | null
           emergencyContactName?: string | null
           emergencyContactPhone?: string | null
           id?: string
@@ -1055,8 +1058,8 @@ export type Database = {
           stripePriceId?: string | null
           stripeSubscriptionId?: string | null
           totalHours?: number | null
-          updatedAt?: string
-          usesAuthentication?: boolean
+          updated_at?: string | null
+          usesAuthentication?: boolean | null
         }
         Relationships: []
       }

@@ -118,14 +118,14 @@ model VolunteersJoining {
 }
 
 model UserOrganization {
-  id             Int      @id @default(autoincrement())
-  userId         String   @db.Uuid
-  organizationId Int
-  role           String
-  permissions    Json
-  filledFields   Json
-  createdAt      DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+  id               Int      @id @default(autoincrement())
+  userId           String   @db.Uuid
+  organizationId   Int
+  role             String
+  permissions      Json?
+  registrationData Json
+  createdAt        DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @db.Timestamptz(3)
 
   user         User         @relation(fields: [userId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
