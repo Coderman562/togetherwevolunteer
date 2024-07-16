@@ -931,30 +931,30 @@ export type Database = {
       userOrganizations: {
         Row: {
           createdAt: string
-          filledFields: Json
           id: number
           organizationId: number
-          permissions: Json
+          permissions: Json | null
+          registrationData: Json | null
           role: string
           updatedAt: string
           userId: string
         }
         Insert: {
           createdAt?: string
-          filledFields: Json
           id?: number
           organizationId: number
-          permissions: Json
+          permissions?: Json | null
+          registrationData?: Json | null
           role: string
           updatedAt: string
           userId: string
         }
         Update: {
           createdAt?: string
-          filledFields?: Json
           id?: number
           organizationId?: number
-          permissions?: Json
+          permissions?: Json | null
+          registrationData?: Json | null
           role?: string
           updatedAt?: string
           userId?: string
