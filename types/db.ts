@@ -994,13 +994,8 @@ export type Database = {
           name: string
           phoneNumber: string | null
           postalCode: string | null
-          profilePicture: string | null
           skills: string | null
           state: string | null
-          stripeCurrentPeriodEnd: string | null
-          stripeCustomerId: string | null
-          stripePriceId: string | null
-          stripeSubscriptionId: string | null
           totalHours: number | null
           updated_at: string | null
           usesAuthentication: boolean | null
@@ -1022,13 +1017,8 @@ export type Database = {
           name: string
           phoneNumber?: string | null
           postalCode?: string | null
-          profilePicture?: string | null
           skills?: string | null
           state?: string | null
-          stripeCurrentPeriodEnd?: string | null
-          stripeCustomerId?: string | null
-          stripePriceId?: string | null
-          stripeSubscriptionId?: string | null
           totalHours?: number | null
           updated_at?: string | null
           usesAuthentication?: boolean | null
@@ -1050,13 +1040,8 @@ export type Database = {
           name?: string
           phoneNumber?: string | null
           postalCode?: string | null
-          profilePicture?: string | null
           skills?: string | null
           state?: string | null
-          stripeCurrentPeriodEnd?: string | null
-          stripeCustomerId?: string | null
-          stripePriceId?: string | null
-          stripeSubscriptionId?: string | null
           totalHours?: number | null
           updated_at?: string | null
           usesAuthentication?: boolean | null

@@ -8,32 +8,27 @@ datasource db {
 }
 
 model User {
-  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                   String
-  email                  String    @unique
-  emailVerified          DateTime? @map("email_verified") @db.Timestamptz(3)
-  image                  String?
-  createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt              DateTime? @updatedAt @map("updated_at") @db.Timestamptz(3)
-  phoneNumber            String?
-  age                    Int?
-  address                String?
-  city                   String?
-  state                  String?
-  country                String?
-  postalCode             String?
-  emergencyContactName   String?
-  emergencyContactPhone  String?
-  skills                 String?
-  availability           Json?
-  certifications         String?
-  totalHours             Int?
-  profilePicture         String?
-  usesAuthentication     Boolean?
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?   @unique
-  stripePriceId          String?
-  stripeCurrentPeriodEnd DateTime? @db.Timestamptz(3)
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                  String
+  email                 String    @unique
+  emailVerified         DateTime? @map("email_verified") @db.Timestamptz(3)
+  image                 String?
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime? @updatedAt @map("updated_at") @db.Timestamptz(3)
+  phoneNumber           String?
+  age                   Int?
+  address               String?
+  city                  String?
+  state                 String?
+  country               String?
+  postalCode            String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  skills                String?
+  availability          Json?
+  certifications        String?
+  totalHours            Int?
+  usesAuthentication    Boolean?
 
   VolunteersJoinings   VolunteersJoining[]
   UserOrganizations    UserOrganization[]
