@@ -30,15 +30,16 @@ model User {
   totalHours            Int?
   usesAuthentication    Boolean?
 
-  VolunteersJoinings   VolunteersJoining[]
-  UserOrganizations    UserOrganization[]
-  EventRegistrations   EventRegistration[]
-  Donations            Donation[]
-  CommunicationLogs    CommunicationLog[]
-  FeedbackAndSurveys   FeedbackAndSurvey[]
-  HoursLogged          HoursLogged[]
-  Documents            Document[]
-  ActivityRegistration ActivityRegistration[]
+  VolunteersJoinings      VolunteersJoining[]
+  UserOrganizations       UserOrganization[]
+  EventRegistrations      EventRegistration[]
+  Donations               Donation[]
+  CommunicationLogs       CommunicationLog[]
+  FeedbackAndSurveys      FeedbackAndSurvey[]
+  HoursLogged             HoursLogged[]
+  Documents               Document[]
+  ActivityRegistration    ActivityRegistration[]
+  OrganizationInvitations OrganizationInvitation[] @relation("InvitationsByAdmin")
 
   @@map("users")
 }
@@ -81,19 +82,36 @@ model Organization {
   createdAt                   DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt                   DateTime  @updatedAt @db.Timestamptz(3)
 
-  VolunteersJoinings VolunteersJoining[]
-  UserOrganizations  UserOrganization[]
-  Events             Event[]
-  Campaigns          Campaign[]
-  Donations          Donation[]
-  Programs           Program[]
-  Communications     Communication[]
-  CommunicationLogs  CommunicationLog[]
-  HoursLogged        HoursLogged[]
-  Documents          Document[]
-  Activity           Activity[]
+  VolunteersJoinings      VolunteersJoining[]
+  UserOrganizations       UserOrganization[]
+  Events                  Event[]
+  Campaigns               Campaign[]
+  Donations               Donation[]
+  Programs                Program[]
+  Communications          Communication[]
+  CommunicationLogs       CommunicationLog[]
+  HoursLogged             HoursLogged[]
+  Documents               Document[]
+  Activity                Activity[]
+  OrganizationInvitations OrganizationInvitation[] @relation("OrganizationInvitations")
 
   @@map("organizations")
+}
+
+model UserOrganization {
+  id               Int      @id @default(autoincrement())
+  userId           String   @db.Uuid
+  organizationId   Int
+  role             String
+  permissions      Json?
+  registrationData Json?
+  createdAt        DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @db.Timestamptz(3)
+
+  user         User         @relation(fields: [userId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("userOrganizations")
 }
 
 model VolunteersJoining {
@@ -112,20 +130,21 @@ model VolunteersJoining {
   @@map("volunteersJoining")
 }
 
-model UserOrganization {
-  id               Int      @id @default(autoincrement())
-  userId           String   @db.Uuid
-  organizationId   Int
-  role             String
-  permissions      Json?
-  registrationData Json?
-  createdAt        DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt        DateTime @updatedAt @db.Timestamptz(3)
+model OrganizationInvitation {
+  id              Int       @id @default(autoincrement())
+  organizationId  Int
+  adminWhoInvited String    @db.Uuid
+  invitedEmail    String
+  role            String
+  permissions     Json?
+  status          String
+  invitedAt       DateTime  @default(now()) @db.Timestamptz(3)
+  acceptedAt      DateTime? @db.Timestamptz(3)
 
-  user         User         @relation(fields: [userId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation("OrganizationInvitations", fields: [organizationId], references: [id])
+  user         User         @relation("InvitationsByAdmin", fields: [adminWhoInvited], references: [id])
 
-  @@map("userOrganizations")
+  @@map("organizationInvitations")
 }
 
 model Event {

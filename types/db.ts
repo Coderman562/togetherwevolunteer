@@ -761,6 +761,57 @@ export type Database = {
           },
         ]
       }
+      organizationInvitations: {
+        Row: {
+          acceptedAt: string | null
+          adminWhoInvited: string
+          id: number
+          invitedAt: string
+          invitedEmail: string
+          organizationId: number
+          permissions: Json | null
+          role: string
+          status: string
+        }
+        Insert: {
+          acceptedAt?: string | null
+          adminWhoInvited: string
+          id?: number
+          invitedAt?: string
+          invitedEmail: string
+          organizationId: number
+          permissions?: Json | null
+          role: string
+          status: string
+        }
+        Update: {
+          acceptedAt?: string | null
+          adminWhoInvited?: string
+          id?: number
+          invitedAt?: string
+          invitedEmail?: string
+          organizationId?: number
+          permissions?: Json | null
+          role?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizationInvitations_adminWhoInvited_fkey"
+            columns: ["adminWhoInvited"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizationInvitations_organizationId_fkey"
+            columns: ["organizationId"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           address: string | null
