@@ -667,6 +667,8 @@ export type Database = {
       hoursLogged: {
         Row: {
           activityId: number | null
+          adminDeniedById: string | null
+          adminVerifiedById: string | null
           approvedAt: string | null
           customFields: Json | null
           date: string
@@ -678,12 +680,14 @@ export type Database = {
           notes: string | null
           organizationId: number
           programId: number | null
+          reasonDenied: string | null
           status: string
           userId: string
-          verifiedBy: string | null
         }
         Insert: {
           activityId?: number | null
+          adminDeniedById?: string | null
+          adminVerifiedById?: string | null
           approvedAt?: string | null
           customFields?: Json | null
           date: string
@@ -695,12 +699,14 @@ export type Database = {
           notes?: string | null
           organizationId: number
           programId?: number | null
+          reasonDenied?: string | null
           status: string
           userId: string
-          verifiedBy?: string | null
         }
         Update: {
           activityId?: number | null
+          adminDeniedById?: string | null
+          adminVerifiedById?: string | null
           approvedAt?: string | null
           customFields?: Json | null
           date?: string
@@ -712,9 +718,9 @@ export type Database = {
           notes?: string | null
           organizationId?: number
           programId?: number | null
+          reasonDenied?: string | null
           status?: string
           userId?: string
-          verifiedBy?: string | null
         }
         Relationships: [
           {
@@ -722,6 +728,20 @@ export type Database = {
             columns: ["activityId"]
             isOneToOne: false
             referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hoursLogged_adminDeniedById_fkey"
+            columns: ["adminDeniedById"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hoursLogged_adminVerifiedById_fkey"
+            columns: ["adminVerifiedById"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -757,6 +777,97 @@ export type Database = {
             columns: ["userId"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizationBadges: {
+        Row: {
+          color: string | null
+          createdAt: string
+          description: string | null
+          id: number
+          image: string | null
+          name: string
+          organizationId: number
+          requiredHours: number
+          updatedAt: string
+        }
+        Insert: {
+          color?: string | null
+          createdAt?: string
+          description?: string | null
+          id?: number
+          image?: string | null
+          name: string
+          organizationId: number
+          requiredHours: number
+          updatedAt: string
+        }
+        Update: {
+          color?: string | null
+          createdAt?: string
+          description?: string | null
+          id?: number
+          image?: string | null
+          name?: string
+          organizationId?: number
+          requiredHours?: number
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizationBadges_organizationId_fkey"
+            columns: ["organizationId"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizationGoals: {
+        Row: {
+          createdAt: string
+          currentProgress: number
+          description: string | null
+          endDate: string
+          id: number
+          organizationId: number
+          startDate: string
+          target: number
+          title: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          currentProgress?: number
+          description?: string | null
+          endDate: string
+          id?: number
+          organizationId: number
+          startDate: string
+          target: number
+          title: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          currentProgress?: number
+          description?: string | null
+          endDate?: string
+          id?: number
+          organizationId?: number
+          startDate?: string
+          target?: number
+          title?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizationGoals_organizationId_fkey"
+            columns: ["organizationId"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]

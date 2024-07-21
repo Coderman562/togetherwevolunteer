@@ -30,16 +30,18 @@ model User {
   totalHours            Int?
   usesAuthentication    Boolean?
 
-  VolunteersJoinings      VolunteersJoining[]
-  UserOrganizations       UserOrganization[]
-  EventRegistrations      EventRegistration[]
-  Donations               Donation[]
-  CommunicationLogs       CommunicationLog[]
-  FeedbackAndSurveys      FeedbackAndSurvey[]
-  HoursLogged             HoursLogged[]
-  Documents               Document[]
-  ActivityRegistration    ActivityRegistration[]
-  OrganizationInvitations OrganizationInvitation[] @relation("InvitationsByAdmin")
+  VolunteersJoinings         VolunteersJoining[]
+  UserOrganizations          UserOrganization[]
+  EventRegistrations         EventRegistration[]
+  Donations                  Donation[]
+  CommunicationLogs          CommunicationLog[]
+  FeedbackAndSurveys         FeedbackAndSurvey[]
+  HoursLogged                HoursLogged[]
+  Documents                  Document[]
+  ActivityRegistration       ActivityRegistration[]
+  OrganizationInvitations    OrganizationInvitation[] @relation("InvitationsByAdmin")
+  HoursLoggedApprovedByAdmin HoursLogged[]            @relation("VerifiedByRelation")
+  HoursLoggedDeniedByAdmin   HoursLogged[]            @relation("DeniedByRelation")
 
   @@map("users")
 }
@@ -94,6 +96,8 @@ model Organization {
   Documents               Document[]
   Activity                Activity[]
   OrganizationInvitations OrganizationInvitation[] @relation("OrganizationInvitations")
+  Goals                   OrganizationGoal[]
+  OrganizationBadge       OrganizationBadge[]
 
   @@map("organizations")
 }
@@ -349,20 +353,22 @@ model ActivityRegistration {
 }
 
 model HoursLogged {
-  id             Int       @id @default(autoincrement())
-  userId         String    @db.Uuid
-  eventId        Int?
-  organizationId Int
-  programId      Int?
-  activityId     Int?
-  hours          Decimal
-  notes          String?
-  date           DateTime  @db.Timestamptz(3)
-  status         String
-  verifiedBy     String?
-  approvedAt     DateTime? @db.Timestamptz(3)
-  loggedAt       DateTime  @default(now()) @db.Timestamptz(3)
-  customFields   Json?
+  id                Int       @id @default(autoincrement())
+  userId            String    @db.Uuid
+  eventId           Int?
+  organizationId    Int
+  programId         Int?
+  activityId        Int?
+  hours             Decimal
+  notes             String?
+  date              DateTime  @db.Timestamptz(3)
+  status            String
+  adminVerifiedById String?   @db.Uuid
+  approvedAt        DateTime? @db.Timestamptz(3)
+  loggedAt          DateTime  @default(now()) @db.Timestamptz(3)
+  customFields      Json?
+  adminDeniedById   String?   @db.Uuid
+  reasonDenied      String?
 
   user            User           @relation(fields: [userId], references: [id])
   event           Event?         @relation(fields: [eventId], references: [id])
@@ -371,6 +377,8 @@ model HoursLogged {
   activity        Activity?      @relation(fields: [activityId], references: [id])
   EventActivity   EventActivity? @relation(fields: [eventActivityId], references: [id])
   eventActivityId Int?
+  verifiedBy      User?          @relation("VerifiedByRelation", fields: [adminVerifiedById], references: [id])
+  deniedBy        User?          @relation("DeniedByRelation", fields: [adminDeniedById], references: [id])
 
   @@map("hoursLogged")
 }
@@ -384,7 +392,7 @@ model Document {
   name           String
   description    String?
   filePath       String
-  uploadedAt     DateTime @default(now()) @db.Timestamptz(3)
+  uploadedAt     DateTime @default(now())
   documentType   String
 
   user         User         @relation(fields: [userId], references: [id])
@@ -412,4 +420,37 @@ model Communication {
   organization Organization @relation(fields: [organizationId], references: [id])
 
   @@map("communications")
+}
+
+model OrganizationGoal {
+  id              Int      @id @default(autoincrement())
+  organizationId  Int
+  title           String
+  description     String?
+  target          Decimal
+  currentProgress Decimal  @default(0)
+  startDate       DateTime @db.Timestamptz(3)
+  endDate         DateTime @db.Timestamptz(3)
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("organizationGoals")
+}
+
+model OrganizationBadge {
+  id             Int      @id @default(autoincrement())
+  organizationId Int
+  name           String
+  description    String?
+  requiredHours  Decimal
+  image          String?
+  color          String?
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("organizationBadges")
 }
