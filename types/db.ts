@@ -48,27 +48,23 @@ export type Database = {
           customFieldsEnabled: boolean
           customHourLoggingFields: Json | null
           description: string | null
-          endTime: string
           id: number
           location: string | null
           name: string
           organizationId: number
           programId: number
-          startTime: string
           updatedAt: string
         }
         Insert: {
           createdAt?: string
-          customFieldsEnabled: boolean
+          customFieldsEnabled?: boolean
           customHourLoggingFields?: Json | null
           description?: string | null
-          endTime: string
           id?: number
           location?: string | null
           name: string
           organizationId: number
           programId: number
-          startTime: string
           updatedAt: string
         }
         Update: {
@@ -76,13 +72,11 @@ export type Database = {
           customFieldsEnabled?: boolean
           customHourLoggingFields?: Json | null
           description?: string | null
-          endTime?: string
           id?: number
           location?: string | null
           name?: string
           organizationId?: number
           programId?: number
-          startTime?: string
           updatedAt?: string
         }
         Relationships: [
@@ -494,6 +488,8 @@ export type Database = {
       eventRegistrations: {
         Row: {
           activityId: number | null
+          adminVerifiedId: string | null
+          attended: boolean
           eventId: number
           guestCount: number | null
           guests: Json | null
@@ -502,9 +498,12 @@ export type Database = {
           status: string
           timeSlotId: number | null
           userId: string
+          verifiedAt: string | null
         }
         Insert: {
           activityId?: number | null
+          adminVerifiedId?: string | null
+          attended?: boolean
           eventId: number
           guestCount?: number | null
           guests?: Json | null
@@ -513,9 +512,12 @@ export type Database = {
           status: string
           timeSlotId?: number | null
           userId: string
+          verifiedAt?: string | null
         }
         Update: {
           activityId?: number | null
+          adminVerifiedId?: string | null
+          attended?: boolean
           eventId?: number
           guestCount?: number | null
           guests?: Json | null
@@ -524,6 +526,7 @@ export type Database = {
           status?: string
           timeSlotId?: number | null
           userId?: string
+          verifiedAt?: string | null
         }
         Relationships: [
           {
@@ -531,6 +534,13 @@ export type Database = {
             columns: ["activityId"]
             isOneToOne: false
             referencedRelation: "eventActivities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "eventRegistrations_adminVerifiedId_fkey"
+            columns: ["adminVerifiedId"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -875,7 +885,7 @@ export type Database = {
       organizationInvitations: {
         Row: {
           acceptedAt: string | null
-          adminWhoInvited: string
+          adminWhoInvitedId: string
           id: number
           invitedAt: string
           invitedEmail: string
@@ -883,10 +893,11 @@ export type Database = {
           permissions: Json | null
           role: string
           status: string
+          userWhoAcceptedId: string | null
         }
         Insert: {
           acceptedAt?: string | null
-          adminWhoInvited: string
+          adminWhoInvitedId: string
           id?: number
           invitedAt?: string
           invitedEmail: string
@@ -894,10 +905,11 @@ export type Database = {
           permissions?: Json | null
           role: string
           status: string
+          userWhoAcceptedId?: string | null
         }
         Update: {
           acceptedAt?: string | null
-          adminWhoInvited?: string
+          adminWhoInvitedId?: string
           id?: number
           invitedAt?: string
           invitedEmail?: string
@@ -905,11 +917,12 @@ export type Database = {
           permissions?: Json | null
           role?: string
           status?: string
+          userWhoAcceptedId?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "organizationInvitations_adminWhoInvited_fkey"
-            columns: ["adminWhoInvited"]
+            foreignKeyName: "organizationInvitations_adminWhoInvitedId_fkey"
+            columns: ["adminWhoInvitedId"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -919,6 +932,13 @@ export type Database = {
             columns: ["organizationId"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizationInvitations_userWhoAcceptedId_fkey"
+            columns: ["userWhoAcceptedId"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -1151,9 +1171,11 @@ export type Database = {
           email_verified: string | null
           emergencyContactName: string | null
           emergencyContactPhone: string | null
+          hasCompletedOnboarding: boolean
           id: string
           image: string | null
           name: string
+          notificationPreferences: Json | null
           phoneNumber: string | null
           postalCode: string | null
           skills: string | null
@@ -1174,9 +1196,11 @@ export type Database = {
           email_verified?: string | null
           emergencyContactName?: string | null
           emergencyContactPhone?: string | null
+          hasCompletedOnboarding?: boolean
           id?: string
           image?: string | null
           name: string
+          notificationPreferences?: Json | null
           phoneNumber?: string | null
           postalCode?: string | null
           skills?: string | null
@@ -1197,9 +1221,11 @@ export type Database = {
           email_verified?: string | null
           emergencyContactName?: string | null
           emergencyContactPhone?: string | null
+          hasCompletedOnboarding?: boolean
           id?: string
           image?: string | null
           name?: string
+          notificationPreferences?: Json | null
           phoneNumber?: string | null
           postalCode?: string | null
           skills?: string | null

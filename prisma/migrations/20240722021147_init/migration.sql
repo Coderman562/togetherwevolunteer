@@ -3,10 +3,10 @@ CREATE TABLE "users" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "emailVerified" TIMESTAMPTZ(3),
+    "email_verified" TIMESTAMPTZ(3),
     "image" TEXT,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+    "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(3),
     "phoneNumber" TEXT,
     "age" INTEGER,
     "address" TEXT,
@@ -20,12 +20,9 @@ CREATE TABLE "users" (
     "availability" JSONB,
     "certifications" TEXT,
     "totalHours" INTEGER,
-    "profilePicture" TEXT,
-    "usesAuthentication" BOOLEAN NOT NULL,
-    "stripeCustomerId" TEXT,
-    "stripeSubscriptionId" TEXT,
-    "stripePriceId" TEXT,
-    "stripeCurrentPeriodEnd" TIMESTAMPTZ(3),
+    "usesAuthentication" BOOLEAN,
+    "hasCompletedOnboarding" BOOLEAN NOT NULL DEFAULT false,
+    "notificationPreferences" JSONB,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -73,6 +70,20 @@ CREATE TABLE "organizations" (
 );
 
 -- CreateTable
+CREATE TABLE "userOrganizations" (
+    "id" SERIAL NOT NULL,
+    "userId" UUID NOT NULL,
+    "organizationId" INTEGER NOT NULL,
+    "role" TEXT NOT NULL,
+    "permissions" JSONB,
+    "registrationData" JSONB,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "userOrganizations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "volunteersJoining" (
     "id" SERIAL NOT NULL,
     "userId" UUID NOT NULL,
@@ -87,17 +98,19 @@ CREATE TABLE "volunteersJoining" (
 );
 
 -- CreateTable
-CREATE TABLE "userOrganizations" (
+CREATE TABLE "organizationInvitations" (
     "id" SERIAL NOT NULL,
-    "userId" UUID NOT NULL,
     "organizationId" INTEGER NOT NULL,
+    "adminWhoInvitedId" UUID NOT NULL,
+    "invitedEmail" TEXT NOT NULL,
     "role" TEXT NOT NULL,
-    "permissions" JSONB NOT NULL,
-    "filledFields" JSONB NOT NULL,
-    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+    "permissions" JSONB,
+    "status" TEXT NOT NULL,
+    "invitedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "acceptedAt" TIMESTAMPTZ(3),
+    "userWhoAcceptedId" UUID,
 
-    CONSTRAINT "userOrganizations_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "organizationInvitations_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -157,8 +170,12 @@ CREATE TABLE "eventRegistrations" (
     "activityId" INTEGER,
     "timeSlotId" INTEGER,
     "guestCount" INTEGER,
+    "guests" JSONB,
     "status" TEXT NOT NULL,
     "registeredAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "attended" BOOLEAN NOT NULL DEFAULT false,
+    "adminVerifiedId" UUID,
+    "verifiedAt" TIMESTAMPTZ(3),
 
     CONSTRAINT "eventRegistrations_pkey" PRIMARY KEY ("id")
 );
@@ -241,13 +258,11 @@ CREATE TABLE "activities" (
     "organizationId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "startTime" TIMESTAMPTZ(3) NOT NULL,
-    "endTime" TIMESTAMPTZ(3) NOT NULL,
     "location" TEXT,
     "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(3) NOT NULL,
     "customHourLoggingFields" JSONB,
-    "customFieldsEnabled" BOOLEAN NOT NULL,
+    "customFieldsEnabled" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "activities_pkey" PRIMARY KEY ("id")
 );
@@ -275,10 +290,12 @@ CREATE TABLE "hoursLogged" (
     "notes" TEXT,
     "date" TIMESTAMPTZ(3) NOT NULL,
     "status" TEXT NOT NULL,
-    "verifiedBy" TEXT,
+    "adminVerifiedById" UUID,
     "approvedAt" TIMESTAMPTZ(3),
     "loggedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "customFields" JSONB,
+    "adminDeniedById" UUID,
+    "reasonDenied" TEXT,
     "eventActivityId" INTEGER,
 
     CONSTRAINT "hoursLogged_pkey" PRIMARY KEY ("id")
@@ -294,7 +311,7 @@ CREATE TABLE "documents" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "filePath" TEXT NOT NULL,
-    "uploadedAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "uploadedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "documentType" TEXT NOT NULL,
 
     CONSTRAINT "documents_pkey" PRIMARY KEY ("id")
@@ -318,14 +335,45 @@ CREATE TABLE "communications" (
     CONSTRAINT "communications_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "organizationGoals" (
+    "id" SERIAL NOT NULL,
+    "organizationId" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "target" DECIMAL(65,30) NOT NULL,
+    "currentProgress" DECIMAL(65,30) NOT NULL DEFAULT 0,
+    "startDate" TIMESTAMPTZ(3) NOT NULL,
+    "endDate" TIMESTAMPTZ(3) NOT NULL,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "organizationGoals_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "organizationBadges" (
+    "id" SERIAL NOT NULL,
+    "organizationId" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "requiredHours" DECIMAL(65,30) NOT NULL,
+    "image" TEXT,
+    "color" TEXT,
+    "createdAt" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "organizationBadges_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
--- CreateIndex
-CREATE UNIQUE INDEX "users_stripeCustomerId_key" ON "users"("stripeCustomerId");
+-- AddForeignKey
+ALTER TABLE "userOrganizations" ADD CONSTRAINT "userOrganizations_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- CreateIndex
-CREATE UNIQUE INDEX "users_stripeSubscriptionId_key" ON "users"("stripeSubscriptionId");
+-- AddForeignKey
+ALTER TABLE "userOrganizations" ADD CONSTRAINT "userOrganizations_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "volunteersJoining" ADD CONSTRAINT "volunteersJoining_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -334,10 +382,13 @@ ALTER TABLE "volunteersJoining" ADD CONSTRAINT "volunteersJoining_userId_fkey" F
 ALTER TABLE "volunteersJoining" ADD CONSTRAINT "volunteersJoining_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "userOrganizations" ADD CONSTRAINT "userOrganizations_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "organizationInvitations" ADD CONSTRAINT "organizationInvitations_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "userOrganizations" ADD CONSTRAINT "userOrganizations_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "organizationInvitations" ADD CONSTRAINT "organizationInvitations_adminWhoInvitedId_fkey" FOREIGN KEY ("adminWhoInvitedId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "organizationInvitations" ADD CONSTRAINT "organizationInvitations_userWhoAcceptedId_fkey" FOREIGN KEY ("userWhoAcceptedId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "events" ADD CONSTRAINT "events_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -362,6 +413,9 @@ ALTER TABLE "eventRegistrations" ADD CONSTRAINT "eventRegistrations_activityId_f
 
 -- AddForeignKey
 ALTER TABLE "eventRegistrations" ADD CONSTRAINT "eventRegistrations_timeSlotId_fkey" FOREIGN KEY ("timeSlotId") REFERENCES "activityTimeSlots"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "eventRegistrations" ADD CONSTRAINT "eventRegistrations_adminVerifiedId_fkey" FOREIGN KEY ("adminVerifiedId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -421,6 +475,12 @@ ALTER TABLE "hoursLogged" ADD CONSTRAINT "hoursLogged_activityId_fkey" FOREIGN K
 ALTER TABLE "hoursLogged" ADD CONSTRAINT "hoursLogged_eventActivityId_fkey" FOREIGN KEY ("eventActivityId") REFERENCES "eventActivities"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "hoursLogged" ADD CONSTRAINT "hoursLogged_adminVerifiedById_fkey" FOREIGN KEY ("adminVerifiedById") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "hoursLogged" ADD CONSTRAINT "hoursLogged_adminDeniedById_fkey" FOREIGN KEY ("adminDeniedById") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "documents" ADD CONSTRAINT "documents_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -434,3 +494,9 @@ ALTER TABLE "documents" ADD CONSTRAINT "documents_organizationId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "communications" ADD CONSTRAINT "communications_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "organizationGoals" ADD CONSTRAINT "organizationGoals_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "organizationBadges" ADD CONSTRAINT "organizationBadges_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
