@@ -111,7 +111,7 @@ model UserOrganization {
   id               Int      @id @default(autoincrement())
   userId           String   @db.Uuid
   organizationId   Int
-  role             String
+  role             Role
   permissions      Json?
   registrationData Json?
   createdAt        DateTime @default(now()) @db.Timestamptz(3)
@@ -121,6 +121,11 @@ model UserOrganization {
   organization Organization @relation(fields: [organizationId], references: [id])
 
   @@map("userOrganizations")
+}
+
+enum Role {
+  ADMIN     @map("admin")
+  VOLUNTEER @map("volunteer")
 }
 
 model VolunteersJoining {

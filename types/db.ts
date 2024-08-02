@@ -1117,7 +1117,7 @@ export type Database = {
           organizationId: number
           permissions: Json | null
           registrationData: Json | null
-          role: string
+          role: Database["public"]["Enums"]["Role"]
           updatedAt: string
           userId: string
         }
@@ -1127,7 +1127,7 @@ export type Database = {
           organizationId: number
           permissions?: Json | null
           registrationData?: Json | null
-          role: string
+          role: Database["public"]["Enums"]["Role"]
           updatedAt: string
           userId: string
         }
@@ -1137,7 +1137,7 @@ export type Database = {
           organizationId?: number
           permissions?: Json | null
           registrationData?: Json | null
-          role?: string
+          role?: Database["public"]["Enums"]["Role"]
           updatedAt?: string
           userId?: string
         }
@@ -1292,7 +1292,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      Role: "admin" | "volunteer"
     }
     CompositeTypes: {
       [_ in never]: never
