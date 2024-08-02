@@ -124,6 +124,7 @@ model UserOrganization {
 }
 
 enum Role {
+  OWNER     @map("owner")
   ADMIN     @map("admin")
   VOLUNTEER @map("volunteer")
 }
