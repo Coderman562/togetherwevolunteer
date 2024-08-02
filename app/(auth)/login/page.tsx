@@ -1,12 +1,12 @@
 import { Metadata } from "next"
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { getAuthUser } from "@/actions/supabase-server"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
-import { Icons } from "@/components/icons"
 import UserAuthForm from "@/components/forms/user-auth-form"
-import { getAuthUser } from "@/actions/supabase-server"
+import { Icons } from "@/components/icons"
 
 export const metadata: Metadata = {
   title: "Login",
