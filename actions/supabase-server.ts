@@ -35,6 +35,27 @@ export async function getAuthUser() {
   }
 }
 
+export async function getLoggedInUser() {
+  const supabase = createServerSupabaseClient()
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
+    if (!authUser) return null
+
+    const { data: user } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", authUser.id)
+      .single()
+
+    return user
+  } catch (error) {
+    console.error("Error:", error)
+    return null
+  }
+}
+
 export async function getUser() {
   const supabase = createServerSupabaseClient()
   try {
@@ -44,15 +65,4 @@ export async function getUser() {
     console.error("Error:", error)
     return null
   }
-}
-
-export async function getPostForUser(postId: Post["id"], userId: User["id"]) {
-  const supabase = createServerSupabaseClient()
-  const { data } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", postId)
-    .eq("author_id", userId)
-    .single()
-  return data ? { ...data, content: data.content as unknown as JSON } : null
 }
