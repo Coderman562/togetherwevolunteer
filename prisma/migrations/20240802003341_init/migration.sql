@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "users" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "name" TEXT NOT NULL,
+    "name" TEXT,
     "email" TEXT NOT NULL,
     "email_verified" TIMESTAMPTZ(3),
     "image" TEXT,
@@ -20,7 +20,7 @@ CREATE TABLE "users" (
     "availability" JSONB,
     "certifications" TEXT,
     "totalHours" INTEGER,
-    "usesAuthentication" BOOLEAN,
+    "usesAuthentication" BOOLEAN NOT NULL DEFAULT false,
     "hasCompletedOnboarding" BOOLEAN NOT NULL DEFAULT false,
     "notificationPreferences" JSONB,
 

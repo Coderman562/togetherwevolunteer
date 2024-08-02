@@ -1174,7 +1174,7 @@ export type Database = {
           hasCompletedOnboarding: boolean
           id: string
           image: string | null
-          name: string
+          name: string | null
           notificationPreferences: Json | null
           phoneNumber: string | null
           postalCode: string | null
@@ -1182,7 +1182,7 @@ export type Database = {
           state: string | null
           totalHours: number | null
           updated_at: string | null
-          usesAuthentication: boolean | null
+          usesAuthentication: boolean
         }
         Insert: {
           address?: string | null
@@ -1199,7 +1199,7 @@ export type Database = {
           hasCompletedOnboarding?: boolean
           id?: string
           image?: string | null
-          name: string
+          name?: string | null
           notificationPreferences?: Json | null
           phoneNumber?: string | null
           postalCode?: string | null
@@ -1207,7 +1207,7 @@ export type Database = {
           state?: string | null
           totalHours?: number | null
           updated_at?: string | null
-          usesAuthentication?: boolean | null
+          usesAuthentication?: boolean
         }
         Update: {
           address?: string | null
@@ -1224,7 +1224,7 @@ export type Database = {
           hasCompletedOnboarding?: boolean
           id?: string
           image?: string | null
-          name?: string
+          name?: string | null
           notificationPreferences?: Json | null
           phoneNumber?: string | null
           postalCode?: string | null
@@ -1232,7 +1232,7 @@ export type Database = {
           state?: string | null
           totalHours?: number | null
           updated_at?: string | null
-          usesAuthentication?: boolean | null
+          usesAuthentication?: boolean
         }
         Relationships: []
       }
