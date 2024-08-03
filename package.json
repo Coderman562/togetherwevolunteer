@@ -16,7 +16,7 @@
     "generate-types": "npx supabase gen types typescript --project-id iamrkftjgskyosholbwj --schema public > types/db.ts",
     "migrate": "npx prisma migrate dev --name",
     "postinstall": "npm run generate-types",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@editorjs/code": "^2.8.0",
