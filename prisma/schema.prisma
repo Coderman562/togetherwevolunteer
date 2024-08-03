@@ -54,6 +54,7 @@ model User {
 model Organization {
   id                          Int       @id @default(autoincrement())
   name                        String
+  slug                        String
   description                 String?
   websiteUrl                  String?
   logoUrl                     String?
@@ -104,6 +105,8 @@ model Organization {
   Goals                   OrganizationGoal[]
   OrganizationBadge       OrganizationBadge[]
 
+  @@index([name])
+  @@index([slug])
   @@map("organizations")
 }
 
@@ -117,7 +120,7 @@ model UserOrganization {
   createdAt        DateTime @default(now()) @db.Timestamptz(3)
   updatedAt        DateTime @updatedAt @db.Timestamptz(3)
 
-  user         User         @relation(fields: [userId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization Organization @relation(fields: [organizationId], references: [id])
 
   @@map("userOrganizations")
@@ -139,29 +142,36 @@ model VolunteersJoining {
   reviewedBy       String?
   registrationData Json
 
-  user         User         @relation(fields: [userId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("volunteersJoining")
 }
 
 model OrganizationInvitation {
-  id                Int       @id @default(autoincrement())
+  id                Int              @id @default(autoincrement())
   organizationId    Int
-  adminWhoInvitedId String    @db.Uuid
+  adminWhoInvitedId String           @db.Uuid
   invitedEmail      String
-  role              String
+  role              Role
   permissions       Json?
-  status            String
-  invitedAt         DateTime  @default(now()) @db.Timestamptz(3)
-  acceptedAt        DateTime? @db.Timestamptz(3)
-  userWhoAcceptedId String?   @db.Uuid
+  status            InvitationStatus
+  invitedAt         DateTime         @default(now()) @db.Timestamptz(3)
+  acceptedAt        DateTime?        @db.Timestamptz(3)
+  userWhoAcceptedId String?          @db.Uuid
 
-  organization    Organization @relation("OrganizationInvitations", fields: [organizationId], references: [id])
-  adminWhoInvited User         @relation("InvitationsByAdmin", fields: [adminWhoInvitedId], references: [id])
-  userWhoAccepted User?        @relation("InvitationsUserAccepted", fields: [userWhoAcceptedId], references: [id])
+  organization    Organization @relation("OrganizationInvitations", fields: [organizationId], references: [id], onDelete: Cascade)
+  adminWhoInvited User         @relation("InvitationsByAdmin", fields: [adminWhoInvitedId], references: [id], onDelete: Cascade)
+  userWhoAccepted User?        @relation("InvitationsUserAccepted", fields: [userWhoAcceptedId], references: [id], onDelete: Cascade)
 
   @@map("organizationInvitations")
+}
+
+enum InvitationStatus {
+  PENDING  @map("pending")
+  ACCEPTED @map("accepted")
+  REJECTED @map("rejected")
+  EXPIRED  @map("expired")
 }
 
 model Event {
@@ -180,8 +190,8 @@ model Event {
   createdAt                 DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt                 DateTime  @updatedAt @db.Timestamptz(3)
 
-  organization       Organization        @relation(fields: [organizationId], references: [id])
-  program            Program?            @relation(fields: [programId], references: [id])
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  program            Program?            @relation(fields: [programId], references: [id], onDelete: Cascade)
   EventActivities    EventActivity[]
   EventRegistrations EventRegistration[]
   HoursLogged        HoursLogged[]
@@ -204,7 +214,7 @@ model EventActivity {
   createdAt                  DateTime @default(now()) @db.Timestamptz(3)
   updatedAt                  DateTime @updatedAt @db.Timestamptz(3)
 
-  event              Event               @relation(fields: [eventId], references: [id])
+  event              Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
   ActivityTimeSlots  ActivityTimeSlot[]
   EventRegistrations EventRegistration[]
   HoursLogged        HoursLogged[]
@@ -220,8 +230,9 @@ model ActivityTimeSlot {
   createdAt  DateTime @default(now()) @db.Timestamptz(3)
   updatedAt  DateTime @updatedAt @db.Timestamptz(3)
 
-  eventActivity      EventActivity       @relation(fields: [activityId], references: [id])
+  eventActivity      EventActivity       @relation(fields: [eventActivityId], references: [id])
   EventRegistrations EventRegistration[]
+  eventActivityId    Int
 
   @@map("activityTimeSlots")
 }
@@ -240,11 +251,11 @@ model EventRegistration {
   adminVerifiedId String?   @db.Uuid
   verifiedAt      DateTime? @db.Timestamptz(3)
 
-  event            Event             @relation(fields: [eventId], references: [id])
-  user             User              @relation(fields: [userId], references: [id])
-  eventActivity    EventActivity?    @relation(fields: [activityId], references: [id])
-  activityTimeSlot ActivityTimeSlot? @relation(fields: [timeSlotId], references: [id])
-  adminVerified    User?             @relation("VerifiedAttendance", fields: [adminVerifiedId], references: [id])
+  event            Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventActivity    EventActivity?    @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityTimeSlot ActivityTimeSlot? @relation(fields: [timeSlotId], references: [id], onDelete: Cascade)
+  adminVerified    User?             @relation("VerifiedAttendance", fields: [adminVerifiedId], references: [id], onDelete: Cascade)
 
   @@map("eventRegistrations")
 }
@@ -260,7 +271,7 @@ model Campaign {
   createdAt      DateTime @default(now()) @db.Timestamptz(3)
   updatedAt      DateTime @updatedAt @db.Timestamptz(3)
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   Donations    Donation[]
 
   @@map("campaigns")
@@ -276,9 +287,9 @@ model Donation {
   paymentMethod  String
   campaignId     Int?
 
-  user         User         @relation(fields: [userId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
-  campaign     Campaign?    @relation(fields: [campaignId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  campaign     Campaign?    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@map("donations")
 }
@@ -292,8 +303,8 @@ model CommunicationLog {
   sentAt         DateTime @db.Timestamptz(3)
   status         String
 
-  user         User         @relation(fields: [userId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("communicationLogs")
 }
@@ -306,8 +317,8 @@ model FeedbackAndSurvey {
   rating       Int
   submittedAt  DateTime @default(now()) @db.Timestamptz(3)
 
-  user  User   @relation(fields: [userId], references: [id])
-  event Event? @relation(fields: [eventId], references: [id])
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@map("feedbackAndSurveys")
 }
@@ -325,7 +336,7 @@ model Program {
   customHourLoggingFields Json?
   customFieldsEnabled     Boolean
 
-  organization Organization  @relation(fields: [organizationId], references: [id])
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   Events       Event[]
   Activities   Activity[]
   HoursLogged  HoursLogged[]
@@ -346,8 +357,8 @@ model Activity {
   customHourLoggingFields Json?
   customFieldsEnabled     Boolean  @default(false)
 
-  program               Program                @relation(fields: [programId], references: [id])
-  organization          Organization           @relation(fields: [organizationId], references: [id])
+  program               Program                @relation(fields: [programId], references: [id], onDelete: Cascade)
+  organization          Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   ActivityRegistrations ActivityRegistration[]
   HoursLogged           HoursLogged[]
 
@@ -361,8 +372,8 @@ model ActivityRegistration {
   status       String
   registeredAt DateTime @default(now()) @db.Timestamptz(3)
 
-  activity Activity @relation(fields: [activityId], references: [id])
-  user     User     @relation(fields: [userId], references: [id])
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("activityRegistrations")
 }
@@ -385,15 +396,15 @@ model HoursLogged {
   adminDeniedById   String?   @db.Uuid
   reasonDenied      String?
 
-  user            User           @relation(fields: [userId], references: [id])
-  event           Event?         @relation(fields: [eventId], references: [id])
-  organization    Organization   @relation(fields: [organizationId], references: [id])
-  program         Program?       @relation(fields: [programId], references: [id])
-  activity        Activity?      @relation(fields: [activityId], references: [id])
-  EventActivity   EventActivity? @relation(fields: [eventActivityId], references: [id])
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event           Event?         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  program         Program?       @relation(fields: [programId], references: [id], onDelete: Cascade)
+  activity        Activity?      @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  EventActivity   EventActivity? @relation(fields: [eventActivityId], references: [id], onDelete: Cascade)
   eventActivityId Int?
-  verifiedBy      User?          @relation("VerifiedByRelation", fields: [adminVerifiedById], references: [id])
-  deniedBy        User?          @relation("DeniedByRelation", fields: [adminDeniedById], references: [id])
+  verifiedBy      User?          @relation("VerifiedByRelation", fields: [adminVerifiedById], references: [id], onDelete: Cascade)
+  deniedBy        User?          @relation("DeniedByRelation", fields: [adminDeniedById], references: [id], onDelete: Cascade)
 
   @@map("hoursLogged")
 }
@@ -410,10 +421,10 @@ model Document {
   uploadedAt     DateTime @default(now())
   documentType   String
 
-  user         User         @relation(fields: [userId], references: [id])
-  event        Event?       @relation(fields: [eventId], references: [id])
-  program      Program?     @relation(fields: [programId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event        Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  program      Program?     @relation(fields: [programId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("documents")
 }
@@ -432,7 +443,7 @@ model Communication {
   createdAt         DateTime @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime @updatedAt @db.Timestamptz(3)
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("communications")
 }
@@ -449,7 +460,7 @@ model OrganizationGoal {
   createdAt       DateTime @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime @updatedAt @db.Timestamptz(3)
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("organizationGoals")
 }
@@ -465,7 +476,7 @@ model OrganizationBadge {
   createdAt      DateTime @default(now()) @db.Timestamptz(3)
   updatedAt      DateTime @updatedAt @db.Timestamptz(3)
 
-  organization Organization @relation(fields: [organizationId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@map("organizationBadges")
 }

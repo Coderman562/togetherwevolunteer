@@ -140,6 +140,7 @@ export type Database = {
           activityId: number
           createdAt: string
           endTime: string
+          eventActivityId: number
           id: number
           startTime: string
           updatedAt: string
@@ -148,6 +149,7 @@ export type Database = {
           activityId: number
           createdAt?: string
           endTime: string
+          eventActivityId: number
           id?: number
           startTime: string
           updatedAt: string
@@ -156,14 +158,15 @@ export type Database = {
           activityId?: number
           createdAt?: string
           endTime?: string
+          eventActivityId?: number
           id?: number
           startTime?: string
           updatedAt?: string
         }
         Relationships: [
           {
-            foreignKeyName: "activityTimeSlots_activityId_fkey"
-            columns: ["activityId"]
+            foreignKeyName: "activityTimeSlots_eventActivityId_fkey"
+            columns: ["eventActivityId"]
             isOneToOne: false
             referencedRelation: "eventActivities"
             referencedColumns: ["id"]
@@ -891,8 +894,8 @@ export type Database = {
           invitedEmail: string
           organizationId: number
           permissions: Json | null
-          role: string
-          status: string
+          role: Database["public"]["Enums"]["Role"]
+          status: Database["public"]["Enums"]["InvitationStatus"]
           userWhoAcceptedId: string | null
         }
         Insert: {
@@ -903,8 +906,8 @@ export type Database = {
           invitedEmail: string
           organizationId: number
           permissions?: Json | null
-          role: string
-          status: string
+          role: Database["public"]["Enums"]["Role"]
+          status: Database["public"]["Enums"]["InvitationStatus"]
           userWhoAcceptedId?: string | null
         }
         Update: {
@@ -915,8 +918,8 @@ export type Database = {
           invitedEmail?: string
           organizationId?: number
           permissions?: Json | null
-          role?: string
-          status?: string
+          role?: Database["public"]["Enums"]["Role"]
+          status?: Database["public"]["Enums"]["InvitationStatus"]
           userWhoAcceptedId?: string | null
         }
         Relationships: [
@@ -962,6 +965,7 @@ export type Database = {
           registrationNumber: string | null
           requiresVolunteerApproval: boolean | null
           siteInformation: Json | null
+          slug: string
           socialFacebook: string | null
           socialInstagram: string | null
           socialLinkedin: string | null
@@ -1000,6 +1004,7 @@ export type Database = {
           registrationNumber?: string | null
           requiresVolunteerApproval?: boolean | null
           siteInformation?: Json | null
+          slug: string
           socialFacebook?: string | null
           socialInstagram?: string | null
           socialLinkedin?: string | null
@@ -1038,6 +1043,7 @@ export type Database = {
           registrationNumber?: string | null
           requiresVolunteerApproval?: boolean | null
           siteInformation?: Json | null
+          slug?: string
           socialFacebook?: string | null
           socialInstagram?: string | null
           socialLinkedin?: string | null
@@ -1289,9 +1295,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_all_rows: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
+      InvitationStatus: "pending" | "accepted" | "rejected" | "expired"
       Role: "admin" | "volunteer" | "owner"
     }
     CompositeTypes: {
