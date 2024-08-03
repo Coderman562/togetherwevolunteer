@@ -2,6 +2,7 @@
 
 import { deleteAccount, updateAccount } from "@/actions/user/userActions"
 
+import { resetDb } from "@/lib/supabase/reset"
 import {
   createTestingUser,
   deleteTestingUser,
@@ -14,8 +15,18 @@ import { completeOnboarding } from "./onboardingActions"
 
 describe("Test Onboarding Actions", () => {
   beforeAll(async () => {
+    await resetDb()
+
     await createTestingUser()
-    const user = await loginTestingUser()
+  })
+
+  beforeEach(async () => {
+    await loginTestingUser()
+  })
+
+  afterAll(async () => {
+    await resetDb()
+    logout()
   })
 
   afterEach(async () => {
