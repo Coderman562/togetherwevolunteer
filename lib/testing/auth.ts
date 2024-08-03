@@ -1,15 +1,18 @@
-import { cookies } from "next/headers"
-import { createServerSupabaseClient } from "@/actions/supabase-server"
-import { AuthApiError } from "@supabase/supabase-js"
+import { cookies } from "next/headers";
+import { createServerSupabaseClient } from "@/actions/supabase-server";
+import { AuthApiError } from "@supabase/supabase-js";
 
-import { supabaseAdmin } from "../supabase/admin"
 
-export const createTestingUser = async () => {
+
+import { supabaseAdmin } from "../supabase/admin";
+
+
+export const createTestingUser = async (email?: string) => {
   const {
     data: { user },
     error,
   } = await supabaseAdmin.auth.admin.createUser({
-    email: "jamezjaquez69@gmail.com",
+    email: email || "jamezjaquez69@gmail.com",
     password: "Testpassword1!",
     user_metadata: { name: "" },
     email_confirm: true,
@@ -24,39 +27,36 @@ export const createTestingUser = async () => {
     return user.user.id
   }
 
-  if (error) throw new Error(error.message)
+  if (error) throw error
   if (!user) throw new Error("Could not create testing user")
 
   return user.id
 }
 
-export const loginTestingUser = async () => {
+export const loginTestingUser = async (email?: string ) => {
   const supabase = createServerSupabaseClient()
 
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: "jamezjaquez69@gmail.com",
-      password: "Testpassword1!",
-    })
-    if (error) {
-      console.error(error)
-      throw new Error(error.message)
-    }
-
-    // For testing, set the next/auth cookie
-    setSupabaseCookie(data.session)
-    return data
-  } catch (error) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email || "jamezjaquez69@gmail.com",
+    password: "Testpassword1!",
+  })
+  if (error) {
     console.error(error)
-    return null
+    throw error
   }
+
+  if (!data) throw new Error("User not logged in properly")
+
+  // For testing, set the next/auth cookie
+  setSupabaseCookie(data.session)
+  return data
 }
 
-export const deleteTestingUser = async () => {
+export const deleteTestingUser = async ( email?: string ) => {
   const { data: user } = await supabaseAdmin
     .from("users")
     .select("*")
-    .eq("email", "jamezjaquez69@gmail.com")
+    .eq("email", email || "jamezjaquez69@gmail.com")
     .single()
 
   if (!user) throw new Error("User not found")
