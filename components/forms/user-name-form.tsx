@@ -3,10 +3,10 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { User } from "@/types/main"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { User } from "@/types/main"
 import { cn } from "@/lib/utils"
 import { userNameSchema } from "@/lib/validations/user"
 import { buttonVariants } from "@/components/ui/button"
@@ -109,9 +109,7 @@ export function UserNameForm({ user, className, ...props }: UserNameFormProps) {
             className={cn(buttonVariants(), className)}
             disabled={isSaving}
           >
-            {isSaving && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )}
+            {isSaving && <Icons.spinner className="mr-2 size-4 animate-spin" />}
             <span>Save</span>
           </button>
         </CardFooter>

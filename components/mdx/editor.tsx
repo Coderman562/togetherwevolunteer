@@ -5,12 +5,14 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import EditorJS from "@editorjs/editorjs"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Post } from "@/types/main"
 import { useForm } from "react-hook-form"
 import TextareaAutosize from "react-textarea-autosize"
 import * as z from "zod"
 
+import { Post } from "@/types/main"
+
 import "@/styles/editor.css"
+
 import { cn } from "@/lib/utils"
 import { postPatchSchema } from "@/lib/validations/post"
 import { buttonVariants } from "@/components/ui/button"
@@ -130,7 +132,7 @@ export function Editor({ post }: EditorProps) {
               className={cn(buttonVariants({ variant: "ghost" }))}
             >
               <>
-                <Icons.chevronLeft className="mr-2 h-4 w-4" />
+                <Icons.chevronLeft className="mr-2 size-4" />
                 Back
               </>
             </Link>
@@ -139,9 +141,7 @@ export function Editor({ post }: EditorProps) {
             </p>
           </div>
           <button type="submit" className={cn(buttonVariants())}>
-            {isSaving && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )}
+            {isSaving && <Icons.spinner className="mr-2 size-4 animate-spin" />}
             <span>Save</span>
           </button>
         </div>
